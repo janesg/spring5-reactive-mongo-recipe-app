@@ -36,10 +36,11 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        log.debug("Loading Bootstrap Data...");
         loadCategories();
         loadUom();
         recipeRepository.saveAll(getRecipes());
-        log.debug("Loading Bootstrap Data");
     }
 
     private void loadCategories(){
