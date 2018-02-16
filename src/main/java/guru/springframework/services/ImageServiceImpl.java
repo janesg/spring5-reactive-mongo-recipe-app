@@ -2,10 +2,13 @@ package guru.springframework.services;
 
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
+import guru.springframework.repositories.reactive.RecipeReactiveRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -14,22 +17,17 @@ import java.io.IOException;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-
-    private final RecipeRepository recipeRepository;
-
-    public ImageServiceImpl( RecipeRepository recipeService) {
-
-        this.recipeRepository = recipeService;
-    }
+    private final RecipeReactiveRepository recipeRepository;
 
     @Override
     @Transactional
-    public void saveImageFile(String recipeId, MultipartFile file) {
+    public Mono<Void> saveImageFile(String recipeId, MultipartFile file) {
 
         try {
-            Recipe recipe = recipeRepository.findById(recipeId).get();
+            Recipe recipe = recipeRepository.findById(recipeId).block();
 
             Byte[] byteObjects = new Byte[file.getBytes().length];
 
@@ -48,5 +46,7 @@ public class ImageServiceImpl implements ImageService {
 
             e.printStackTrace();
         }
+
+        return Mono.empty();
     }
 }
